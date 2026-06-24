@@ -1,4 +1,4 @@
-name: Reusable workflow CICD pipeline
+name: Bootstrap
 on: 
  workflow_dispatch:
       inputs:
@@ -8,6 +8,7 @@ on:
             type: choice
             options:
             - execute bootstrap
+            - destroy
 concurrency:
   group: terraform-bootstrap
   cancel-in-progress: false
@@ -137,6 +138,9 @@ jobs:
         needs:
           - terragrunt-scan
           - terraform-scan
+          - detect-changes
+        if: |
+          needs.detect-changes.outputs.terragrunt_bootstrap_changed == 'true'
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -184,3 +188,11 @@ jobs:
               shell: bash
               run: |
                 terragrunt init -migrate-state -force-copy -terragrunt-non-interactive 
+            
+            - name: Destroy Bootstrap
+              if: ${{ github.event.inputs.action == 'destroy' }}
+              working-directory: terragrunt/bootstrap/local
+              run: |
+                set -euo pipefail
+                terragrunt destroy --auto-approve --terragrunt-non-interactive
+                
