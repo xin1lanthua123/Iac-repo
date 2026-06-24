@@ -51,6 +51,7 @@ jobs:
 
           TF_BOOTSTRAP="${{ steps.filter.outputs.terraform-bootstrap_files }}"
           TG_BOOT_FILES="${{ steps.filter.outputs.terragrunt-bootstrap_files }}"
+          
 
           if [ -n "$TF_BOOTSTRAP" ]; then
             echo "terraform_bootstrap_changed=true" >> $GITHUB_OUTPUT
@@ -62,6 +63,14 @@ jobs:
             echo "terragrunt_bootstrap_changed=true" >> $GITHUB_OUTPUT
           else
             echo "terragrunt_bootstrap_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          WORKFLOW_CHANGED="${{ steps.filter.outputs.workflow }}"
+
+          if [ "$WORKFLOW_CHANGED" = "true" ]; then
+            echo "workflow_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "workflow_changed=false" >> $GITHUB_OUTPUT
           fi
 
   terraform-scan:
