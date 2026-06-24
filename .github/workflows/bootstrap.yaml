@@ -179,6 +179,11 @@ jobs:
         working-directory: terragrunt/bootstrap/local
         run: |
           terragrunt init -migrate-state -force-copy -terragrunt-non-interactive
+      - name: Recreate backend config
+        working-directory: terragrunt/bootstrap/local
+        run: |
+          chmod +x remote_state.sh
+          ./remote_state.sh
 
       - name: Destroy Bootstrap
         if: ${{ github.event.inputs.action == 'destroy' }}
