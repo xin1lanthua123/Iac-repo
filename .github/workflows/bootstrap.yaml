@@ -7,7 +7,7 @@ on:
             required: true
             type: choice
             options:
-            - execute bootstrap
+            - apply
             - destroy
 concurrency:
   group: terraform-bootstrap
@@ -92,11 +92,6 @@ jobs:
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v3
 
-
-        - name: Check Terraform manifest logic
-          working-directory: infra/bootstrap
-          run: |
-            terraform validate
 
         - name: Check Terraform manifest logic
           working-directory: infra/bootstrap
