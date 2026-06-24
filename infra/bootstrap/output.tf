@@ -17,7 +17,3 @@ output "aws_kms_key" {
 output "github_action_infra_role_arn" {
   value = aws_iam_role.github_actions_infra.arn
 }
-
-output "github_action_bootstrap_role_arn" {
-  value = aws_iam_role.github_actions_bootstrap.arn
-}
