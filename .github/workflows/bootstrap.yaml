@@ -23,7 +23,7 @@ jobs:
     outputs:
       terraform_bootstrap_changed: ${{ steps.extract.outputs.terraform_bootstrap_changed }}
       terragrunt_bootstrap_changed: ${{ steps.extract.outputs.terragrunt_bootstrap_changed }}
-      workflow_changed: ${{ steps.filter.outputs.workflow }}
+      workflow_changed: ${{ steps.extract.outputs.workflow }}
 
     steps:
       - name: Checkout
