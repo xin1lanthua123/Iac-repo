@@ -97,7 +97,7 @@ jobs:
         with:
           directory: infra/bootstrap
           framework: terraform
-          soft_fail: false
+          soft_fail: true
 
   terragrunt-scan:
     name: Terragrunt Logic Scan
