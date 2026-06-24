@@ -23,6 +23,7 @@ jobs:
     outputs:
       terraform_bootstrap_changed: ${{ steps.extract.outputs.terraform_bootstrap_changed }}
       terragrunt_bootstrap_changed: ${{ steps.extract.outputs.terragrunt_bootstrap_changed }}
+      workflow_changed: ${{ steps.filter.outputs.workflow }}
 
     steps:
       - name: Checkout
@@ -40,6 +41,8 @@ jobs:
               - 'infra/bootstrap/**'
             terragrunt-bootstrap:
               - 'terragrunt/bootstrap/**'
+            workflow:
+              - '.github/workflows/bootstrap.yaml'
 
       - name: Extract changed paths
         id: extract
@@ -65,7 +68,9 @@ jobs:
     name: Terraform Security Scan
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.terraform_bootstrap_changed == 'true'
+    if: |
+      needs.detect-changes.outputs.terraform_bootstrap_changed == 'true' ||
+      needs.detect-changes.outputs.workflow_changed == 'true'
 
     steps:
       - name: Checkout
@@ -89,7 +94,9 @@ jobs:
     name: Terragrunt Logic Scan
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.terragrunt_bootstrap_changed == 'true'
+    if: |
+      needs.detect-changes.outputs.terraform_bootstrap_changed == 'true' ||
+      needs.detect-changes.outputs.workflow_changed == 'true'
 
     steps:
       - name: Checkout
@@ -112,7 +119,9 @@ jobs:
       - terraform-scan
       - terragrunt-scan
 
-    if: needs.detect-changes.outputs.terragrunt_bootstrap_changed == 'true'
+    if: |
+      needs.detect-changes.outputs.terraform_bootstrap_changed == 'true' ||
+      needs.detect-changes.outputs.workflow_changed == 'true'
 
     steps:
       - name: Checkout
