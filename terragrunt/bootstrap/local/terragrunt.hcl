@@ -1,6 +1,6 @@
 
 terraform {
-    source = "../../../../infra/bootstrap"
+    source = "../../../infra/bootstrap"
 }
 
 include "env" {
