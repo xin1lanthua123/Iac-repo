@@ -1,6 +1,5 @@
-BUCKET=$(terragrunt output -raw tfstate_bucket_name)
-DYNAMODB_LOCK=$(terragrunt output -raw lock_table_name)
-# KMS_KEY=$(terragrunt output -raw aws_kms_key)
+BUCKET="myapp-terraform-tf-state"
+DYNAMODB_LOCK="myapp-terraform-locks"
 echo "S3 bucket : $BUCKET"
 echo "DynamoDB lock :$DYNAMODB_LOCK"
 
@@ -29,7 +28,7 @@ remote_state {
 }
 
 terraform {
-    source = "../../../bootstrap"
+    source = "../../../infra/bootstrap"
 }
 
 include "env" {

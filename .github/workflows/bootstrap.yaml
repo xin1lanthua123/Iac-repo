@@ -1,4 +1,4 @@
-name: Bootstrapp
+name: Bootstrap
 
 on:
   workflow_dispatch:
