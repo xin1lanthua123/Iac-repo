@@ -87,8 +87,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform validate
-        working-directory: infra/bootstrap
-        run: terraform validate
+        working-directory: infra/bootstrap  
+        run: |
+          terraform init
+          terraform validate
 
       - name: Checkov scan
         uses: bridgecrewio/checkov-action@v12
@@ -116,8 +118,9 @@ jobs:
           tofu_version: '1.10.1'
 
       - name: Terragrunt validate
-        working-directory: terragrunt
-        run: terragrunt run-all validate
+        working-directory: terragrunt/bootstrap/local
+        run: | 
+          terragrunt run-all validate
 
   terraform-bootstrap:
     runs-on: ubuntu-latest
