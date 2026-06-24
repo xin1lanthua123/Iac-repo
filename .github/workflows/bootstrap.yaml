@@ -23,7 +23,7 @@ jobs:
     outputs:
       terraform_bootstrap_changed: ${{ steps.extract.outputs.terraform_bootstrap_changed }}
       terragrunt_bootstrap_changed: ${{ steps.extract.outputs.terragrunt_bootstrap_changed }}
-      workflow_changed: ${{ steps.extract.outputs.workflow }}
+      workflow_changed: ${{ steps.extract.outputs.workflow_changed }}
 
     steps:
       - name: Checkout
@@ -49,25 +49,23 @@ jobs:
         run: |
           set -euo pipefail
 
-          TF_BOOTSTRAP="${{ steps.filter.outputs.terraform-bootstrap_files }}"
-          TG_BOOT_FILES="${{ steps.filter.outputs.terragrunt-bootstrap_files }}"
-          
+          TF_BOOTSTRAP="${{ steps.filter.outputs.terraform-bootstrap }}"
+          TG_BOOTSTRAP="${{ steps.filter.outputs.terragrunt-bootstrap }}"
+          WORKFLOW="${{ steps.filter.outputs.workflow }}"
 
-          if [ -n "$TF_BOOTSTRAP" ]; then
+          if [ "$TF_BOOTSTRAP" = "true" ]; then
             echo "terraform_bootstrap_changed=true" >> $GITHUB_OUTPUT
           else
             echo "terraform_bootstrap_changed=false" >> $GITHUB_OUTPUT
           fi
 
-          if [ -n "$TG_BOOT_FILES" ]; then
+          if [ "$TG_BOOTSTRAP" = "true" ]; then
             echo "terragrunt_bootstrap_changed=true" >> $GITHUB_OUTPUT
           else
             echo "terragrunt_bootstrap_changed=false" >> $GITHUB_OUTPUT
           fi
 
-          WORKFLOW_CHANGED="${{ steps.filter.outputs.workflow }}"
-
-          if [ "$WORKFLOW_CHANGED" = "true" ]; then
+          if [ "$WORKFLOW" = "true" ]; then
             echo "workflow_changed=true" >> $GITHUB_OUTPUT
           else
             echo "workflow_changed=false" >> $GITHUB_OUTPUT
