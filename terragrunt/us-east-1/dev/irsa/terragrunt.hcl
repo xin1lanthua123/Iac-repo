@@ -35,8 +35,7 @@ inputs = {
   ebs_csi_driver_sa       = include.env.locals.irsa.service_accounts.ebs_csi_driver_sa
   ebs_csi_version         = include.env.locals.irsa.service_accounts.ebs_csi_version
   alb_service_sa          = include.env.locals.irsa.service_accounts.alb_service_sa
-  helm_argocd_version     = include.env.locals.irsa.service_accounts.helm_argocd_version
-  server_insecure         = include.env.locals.irsa.service_accounts.server_insecure
+ 
 }
 
 dependency "eks_core" {
