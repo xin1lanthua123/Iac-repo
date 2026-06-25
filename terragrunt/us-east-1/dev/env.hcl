@@ -28,9 +28,9 @@ locals {
       domain_name           = "quanldl.uk"
       region                = "us-east-1"
       enable_alb_controller = true
-      enable_dns_external   = false
-      enable_ebs_csi_driver = false
-      enable_eso            = false
+      enable_dns_external   = true
+      enable_ebs_csi_driver = true
+      enable_eso            = true
       enable_karpenter      = true
   }
     service_accounts = {
@@ -43,9 +43,6 @@ locals {
       server_insecure         = true
       external_dns_sa         = "external-dns"
   }
-  }
-  S3_logs = {
-    enable_kms = true
   }
   vpc = {
      single_nat_gateway = true
