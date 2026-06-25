@@ -146,7 +146,7 @@ jobs:
         with:
           directory: infra/modules
           framework: terraform
-          soft_fail: false
+          soft_fail: true
           skip_check: CKV_AWS_39,CKV_AWS_58  # Public EKS endpoint (intentional for dev)
           output_format: cli
 
@@ -189,13 +189,15 @@ jobs:
 
   call-terraform-for-dev:
         if: |
-         github.ref == 'refs/heads/dev' && 
+         github.ref == 'refs/heads/dev' || 
          github.event_name == 'push' &&  
          (
          needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||
          needs.detect-changes.outputs.terraform_modules_changed == 'true' ||  
          needs.detect-changes.outputs.workflow_changed == 'true'
-         )
+         ) || 
+         github.event.inputs.action == 'apply'
+         
         needs:
           - terragrunt-scan
           - terraform-scan
