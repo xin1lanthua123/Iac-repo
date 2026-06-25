@@ -19,6 +19,6 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
   tags = merge(var.tags,{
     Name = "${var.project_name}-private-${each.key}"
-    "kubernetes.io/role/internal-alb" = "1"
+    "kubernetes.io/role/internal-elb" = "1"
 })
 }
