@@ -1,4 +1,4 @@
-name: Production environment CI pipeline
+name: Infra yaml file
 on: 
     workflow_dispatch:
       inputs:
