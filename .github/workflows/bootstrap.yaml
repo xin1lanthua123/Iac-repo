@@ -89,7 +89,7 @@ jobs:
       - name: Terraform validate
         working-directory: infra/bootstrap  
         run: |
-          terraform init
+          terraform init -backend=false
           terraform validate
 
       - name: Checkov scan
@@ -98,6 +98,7 @@ jobs:
           directory: infra/bootstrap
           framework: terraform
           soft_fail: true
+          output_format: cli
 
   terragrunt-scan:
     name: Terragrunt Logic Scan

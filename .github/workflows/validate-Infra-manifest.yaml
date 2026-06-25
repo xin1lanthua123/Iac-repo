@@ -1,4 +1,4 @@
-name: validate workflow
+name: validate and deploy workflow
 on:
   workflow_dispatch:
       inputs:
@@ -26,10 +26,11 @@ on:
   # push:
   #   branches:
   #       - main
-  #       - ci/feature/*
+  #       - dev
   #   paths:
   #       - infra/**
   #       - terragrunt/**
+  #       - .github/workflows/validate-Infra-manifest.yaml
   #   tags:
   #     - "[0-9]*.[0-9]*.[0-9]*"
 concurrency:
@@ -41,11 +42,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
 
-      terraform_bootstrap_changed: ${{ steps.extract.outputs.terraform_bootstrap_changed }}
+      workflow_changed: ${{ steps.extract.outputs.workflow_changed }}
+
       terraform_modules_changed: ${{ steps.extract.outputs.terraform_modules_changed }}
       terraform_modules: ${{ steps.extract.outputs.terraform_modules }}
 
-      terragrunt_bootstrap_changed: ${{ steps.extract.outputs.terragrunt_bootstrap_changed }}
       terragrunt_modules_changed: ${{ steps.extract.outputs.terragrunt_modules_changed }}
       terragrunt_modules: ${{ steps.extract.outputs.terragrunt_modules }}
       
@@ -61,37 +62,17 @@ jobs:
         with:
           list-files: shell
           filters: |
-            terraform-bootstrap:
-              - 'infra/bootstrap/**'
             terraform-modules:
               - 'infra/modules/**'
-            terragrunt-bootstrap:
-              - 'terragrunt/bootstrap/**'
             terragrunt-modules:
               - 'terragrunt/us-east-1/**'
+            workflow:
+              - '.github/workflows/validate-Infra-manifest.yaml'
 
       - name: Extract service list from changed files
         id: extract
         run: |
             set -euo pipefail
-
-            # TERRAFORM BOOTSTRAP
-
-            TF_BOOTSTRAP="${{ steps.filter.outputs.terraform-bootstrap_files }}"
-
-            if [ -n "$TF_BOOTSTRAP" ]; then
-              BOOT=$(echo "$TF_BOOTSTRAP" \
-                | tr ' ' '\n' \
-                | cut -d '/' -f2 \
-                | sort -u \
-                | jq -R -s -c 'split("\n") | map(select(length>0))')
-
-              echo "terraform_bootstrap_changed=true" >> $GITHUB_OUTPUT
-              echo "terraform_bootstrap=$BOOT" >> $GITHUB_OUTPUT
-            else
-              echo "terraform_bootstrap_changed=false" >> $GITHUB_OUTPUT
-              echo "terraform_bootstrap=[]" >> $GITHUB_OUTPUT
-            fi
 
              #TERRAFORM MODULES
 
@@ -109,25 +90,6 @@ jobs:
               echo "terraform_modules_changed=false" >> $GITHUB_OUTPUT
               echo "terraform_modules=[]" >> $GITHUB_OUTPUT
             fi
-            
-            # TERRAGRUNT BOOTSTRAP
-
-            TG_BOOT_FILES="${{ steps.filter.outputs.terragrunt-bootstrap_files }}"
-
-            if [ -n "$TG_BOOT_FILES" ]; then
-              TG_BOOT=$(echo "$TG_BOOT_FILES" \
-                | tr ' ' '\n' \
-                | cut -d'/' -f2 \
-                | sort -u \
-                | jq -R -s -c 'split("\n") | map(select(length>0))')
-
-              echo "terragrunt_bootstrap_changed=true" >> $GITHUB_OUTPUT
-              echo "terragrunt_bootstrap=$TG_BOOT" >> $GITHUB_OUTPUT
-            else
-              echo "terragrunt_bootstrap_changed=false" >> $GITHUB_OUTPUT
-              echo "terragrunt_bootstrap=[]" >> $GITHUB_OUTPUT
-            fi
-
             
             # TERRAGRUNT MODULES
            
@@ -147,13 +109,20 @@ jobs:
               echo "terragrunt_modules=[]" >> $GITHUB_OUTPUT
             fi
 
+            WORKFLOW="${{ steps.filter.outputs.workflow }}"
+
+            if [ "$WORKFLOW" = "true" ]; then
+              echo "workflow_changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "workflow_changed=false" >> $GITHUB_OUTPUT
+            fi
+
   terraform-scan:
     name: " Terraform Security Scan"
     runs-on: ubuntu-latest
     needs: detect-changes
     if: |
-     needs.detect-changes.outputs.terraform_modules_changed == 'true' ||
-     needs.detect-changes.outputs.terraform_bootstrap_changed == 'true'
+     needs.detect-changes.outputs.terraform_modules_changed == 'true'  ||  needs.detect-changes.outputs.workflow_changed == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -168,20 +137,16 @@ jobs:
 
       - name: Check Terraform manifest logic
         if: needs.detect-changes.outputs.terraform_modules_changed == 'true'
-        working-directory: infra/module/${{ matrix.modules }}
+        working-directory: infra/modules/${{ matrix.modules }}
         run: |
+          terraform init -backend=false
           terraform validate
 
-      - name: Check Terraform manifest logic
-        if: needs.detect-changes.outputs.terraform_bootstrap_changed == 'true'
-        working-directory: infra/bootstrap
-        run: |
-          terraform validate
 
       - name: Run Checkov on Terraform
         uses: bridgecrewio/checkov-action@v12
         with:
-          directory: infra/
+          directory: infra/modules/${{ matrix.modules }}
           framework: terraform
           soft_fail: false
           skip_check: CKV_AWS_39,CKV_AWS_58  # Public EKS endpoint (intentional for dev)
@@ -192,8 +157,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     if: |
-      needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||
-      needs.detect-changes.outputs.terragrunt_bootstrap_changed == 'true'
+      needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||  needs.detect-changes.outputs.workflow_changed == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        modules : ${{ fromJson(needs.detect-changes.outputs.terragrunt_modules) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -204,8 +172,15 @@ jobs:
               tg_version: '0.82.2'
               tofu_version: '1.10.1'
 
-      - name: Check Terragrunt manifest logic
-        working-directory: terragrunt 
+      - name: Check Terragrunt manifest logic in dev
+        if: inputs.env == 'dev'
+        working-directory: terragrunt/us-east-1/${{inputs.env}}
+        run: |
+          terragrunt run-all validate
+
+      - name: Check Terragrunt manifest logic in prod
+        if: inputs.env == 'prod'
+        working-directory: terragrunt/us-east-1/${{inputs.env}}
         run: |
           terragrunt run-all validate
 
@@ -213,14 +188,18 @@ jobs:
         if: |
          github.ref == 'refs/heads/dev' && 
          github.event_name == 'push' &&  
-         needs.detect-changes.outputs.terragrunt_modules_changed == 'true'
+         (
+         needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||
+         needs.detect-changes.outputs.terraform_modules_changed == 'true' ||  
+         needs.detect-changes.outputs.workflow_changed == 'true'
+         )
         needs:
           - terragrunt-scan
           - terraform-scan
           - detect-changes
         uses: ./.github/workflows/workflow-call.yaml
         with: 
-            env : ${{ inputs.env }} 
+            env : ${{ inputs.env || 'dev' }}
             action: ${{ inputs.action }}
             aws_region: ${{ vars.AWS_REGION }}
         secrets: inherit
@@ -229,14 +208,18 @@ jobs:
         if: |
          github.ref == 'refs/heads/main'&& 
          github.event_name == 'push' &&  
-         needs.detect-changes.outputs.terragrunt_modules_changed == 'true'
+         (
+         needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||
+         needs.detect-changes.outputs.terraform_modules_changed == 'true'|| 
+         needs.detect-changes.outputs.workflow_changed == 'true'
+         )
         needs:
           - terragrunt-scan
           - terraform-scan
           - detect-changes
         uses: ./.github/workflows/workflow-call.yaml
         with: 
-            env : ${{ inputs.env }} 
+            env : ${{ inputs.env || 'prod' }} 
             action: ${{ inputs.action }}
             aws_region: ${{ vars.AWS_REGION }}
         secrets: inherit

@@ -94,27 +94,6 @@ jobs:
           run: |
             set -euo pipefail
             terragrunt run-all destroy -auto-approve --terragrunt-non-interactive
-
-        - name: Migrate backend s3 back to local
-          working-directory: terragrunt/bootstrap/local
-          shell: bash
-          run: |
-            set -euo pipefail
-            terragrunt init -migrate-state -force-copy -terragrunt-non-interactive 
-
-        - name: Destroy terraform bootstrap using terragrunt
-          working-directory: terragrunt/bootstrap/local
-          shell: bash
-          run: |
-            
-            terragrunt destroy -auto-approve --terragrunt-non-interactive
         
-        - name: destroy all s3 bucket versioning
-          working-directory: terragrunt
-          shell: bash
-          run: |
-            set -euo pipefail
-            chmod +x delete-s3.sh
-            ./delete-s3.sh
 
         
