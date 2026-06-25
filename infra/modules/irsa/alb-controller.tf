@@ -36,4 +36,8 @@ resource "aws_iam_policy" "alb_controller_policy" {
 resource "aws_iam_role_policy_attachment" "alb_attach" {
   role       = aws_iam_role.alb_irsa_role[0].name
   policy_arn = aws_iam_policy.alb_controller_policy[0].arn
+  depends_on = [
+  aws_iam_role.alb_irsa_role,
+  aws_iam_policy.alb_controller_policy
+]
 }
