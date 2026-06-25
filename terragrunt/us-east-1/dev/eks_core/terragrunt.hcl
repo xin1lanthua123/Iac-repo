@@ -8,11 +8,6 @@ include "env" {
     }
 terraform {
   source = "../../../../infra/modules/eks_core"
-
-  extra_arguments "timeout" {
-    commands  = ["apply", "destroy"]
-    arguments = ["-timeout=30m"]
-  }
 }
 inputs = {
     vpc_id             = dependency.vpc.outputs.vpc_id
