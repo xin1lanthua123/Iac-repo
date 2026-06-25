@@ -29,8 +29,6 @@ locals {
       external_secrets_sa     = "external-secrets"
       ebs_csi_driver_sa       = "ebs-csi-controller-sa"
       ebs_csi_version         = "v1.30.0-eksbuild.1"
-      helm_argocd_version     = "7.8.2"
-      server_insecure         = true
       external_dns_sa         = "external-dns"
   }
   }
