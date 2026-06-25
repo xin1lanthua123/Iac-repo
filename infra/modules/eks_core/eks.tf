@@ -23,6 +23,8 @@ resource "aws_eks_cluster" "eks" {
 }
 
 resource "aws_security_group" "alb_sg" {
+  name        = "${var.env}-${var.project_name}-alb-sg"
+  description = "Security Group for ALB"
   vpc_id = var.vpc_id
 
   ingress {
@@ -40,6 +42,8 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 resource "aws_security_group" "eks_cluster_sg" {
+  name        = "${var.env}-${var.project_name}-eks-cluster-sg"
+  description = "Security Group for EKS Cluster"
   vpc_id = var.vpc_id
 
   ingress {
@@ -56,6 +60,8 @@ resource "aws_security_group" "eks_cluster_sg" {
   }
 }
 resource "aws_security_group" "eks_nodes_sg" {
+  name        = "${var.env}-${var.project_name}-eks-nodes-sg"
+  description = "Security Group for EKS Worker Nodes"
   vpc_id = var.vpc_id
 
  
