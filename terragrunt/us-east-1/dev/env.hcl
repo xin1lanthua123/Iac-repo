@@ -50,7 +50,7 @@ locals {
           node_instance_type = "t3.large"
           desired_size       = 2
           min_size           = 2
-          max_size           = 3
+          max_size           = 4
         }
     }
   }
