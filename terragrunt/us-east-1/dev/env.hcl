@@ -1,15 +1,5 @@
 
 locals {
-  kms_tags = { 
-    kms_key_alias = "alias/s3-logs-key"
-    kms_s3_tags = {
-    
-    Name        = "dev-s3-logs-kms"
-    Project     = "my-app"
-    Environment = "dev"
-    ManagedBy   = "terraform"
-  }
-}
   tags = {
     env          = "dev"
     Project      = "my-app"
@@ -43,9 +33,6 @@ locals {
       server_insecure         = true
       external_dns_sa         = "external-dns"
   }
-  }
-  S3_logs = {
-    enable_kms = true
   }
   vpc = {
      single_nat_gateway = true
