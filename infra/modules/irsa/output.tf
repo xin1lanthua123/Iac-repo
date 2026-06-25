@@ -23,11 +23,4 @@ output "ebs_csi_role_arn" {
   value       = var.enable_ebs_csi_driver ? aws_iam_role.ebs_csi[0].arn : null
   description = "IAM role ARN for EBS CSI Driver"
 }
-output "argocd_namespace" {
-  value = kubernetes_namespace_v1.argocd.metadata[0].name
-}
-
-output "argocd_release_name" {
-  value = helm_release.argocd.name
-}
 
