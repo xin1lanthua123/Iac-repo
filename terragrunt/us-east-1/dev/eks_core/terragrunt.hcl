@@ -7,7 +7,12 @@ include "env" {
     merge_strategy = "no_merge"
     }
 terraform {
-    source = "../../../../infra/modules/eks_core"
+  source = "../../../../infra/modules/eks_core"
+
+  extra_arguments "timeout" {
+    commands  = ["apply", "destroy"]
+    arguments = ["-timeout=30m"]
+  }
 }
 inputs = {
     vpc_id             = dependency.vpc.outputs.vpc_id
