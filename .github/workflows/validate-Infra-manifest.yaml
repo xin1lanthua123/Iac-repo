@@ -122,11 +122,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     if: |
-     needs.detect-changes.outputs.terraform_modules_changed == 'true'  ||  needs.detect-changes.outputs.workflow_changed == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        modules : ${{ fromJson(needs.detect-changes.outputs.terraform_modules) }}
+     needs.detect-changes.outputs.terraform_modules_changed == 'true'  ||  
+     needs.detect-changes.outputs.workflow_changed == 'true'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -137,7 +135,7 @@ jobs:
 
       - name: Check Terraform manifest logic
         if: needs.detect-changes.outputs.terraform_modules_changed == 'true'
-        working-directory: infra/modules/${{ matrix.modules }}
+        working-directory: infra/modules
         run: |
           terraform init -backend=false
           terraform validate
@@ -146,7 +144,7 @@ jobs:
       - name: Run Checkov on Terraform
         uses: bridgecrewio/checkov-action@v12
         with:
-          directory: infra/modules/${{ matrix.modules }}
+          directory: infra/modules
           framework: terraform
           soft_fail: false
           skip_check: CKV_AWS_39,CKV_AWS_58  # Public EKS endpoint (intentional for dev)
@@ -157,11 +155,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     if: |
-      needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||  needs.detect-changes.outputs.workflow_changed == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        modules : ${{ fromJson(needs.detect-changes.outputs.terragrunt_modules) }}
+      needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||  
+      needs.detect-changes.outputs.workflow_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -177,12 +172,20 @@ jobs:
         working-directory: terragrunt/us-east-1/${{inputs.env}}
         run: |
           terragrunt run-all validate
+        env: 
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} 
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+          AWS_REGION: us-east-1
 
       - name: Check Terragrunt manifest logic in prod
         if: inputs.env == 'prod'
         working-directory: terragrunt/us-east-1/${{inputs.env}}
         run: |
           terragrunt run-all validate
+        env: 
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} 
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+          AWS_REGION: us-east-1
 
   call-terraform-for-dev:
         if: |
