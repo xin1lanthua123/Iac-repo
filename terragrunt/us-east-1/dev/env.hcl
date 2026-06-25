@@ -1,15 +1,5 @@
 
 locals {
-  kms_tags = { 
-    kms_key_alias = "alias/s3-logs-key"
-    kms_s3_tags = {
-    
-    Name        = "dev-s3-logs-kms"
-    Project     = "my-app"
-    Environment = "dev"
-    ManagedBy   = "terraform"
-  }
-}
   tags = {
     env          = "dev"
     Project      = "my-app"
