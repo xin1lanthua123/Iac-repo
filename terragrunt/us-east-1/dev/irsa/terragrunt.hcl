@@ -48,6 +48,7 @@ dependency "eks_core" {
     oidc_provider_arn = "arn:aws:iam::111111111111:oidc-provider/oidc.eks.ap-southeast-1.amazonaws.com/id/MOCK"
     oidc_provider_url = "oidc.eks.ap-southeast-1.amazonaws.com/id/MOCK"
     cluster_name      = "eks-cluster"
+    eks_core_output = "mock-eks_core-output"
   }
 
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "init"]
@@ -58,6 +59,7 @@ dependency "vpc" {
    
     mock_outputs = {
     vpc_id = "vpc-000000000000"
+    
   }
 
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "init"]
