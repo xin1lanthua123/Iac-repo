@@ -88,7 +88,13 @@ resource "aws_security_group" "eks_nodes_sg" {
     protocol        = "tcp"
     security_groups = [aws_security_group.eks_cluster_sg.id]
   }
-
+  ingress {
+    description     = "EKS control plane to webhook of alb controller"
+    from_port       = 9443
+    to_port         = 9443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.eks_cluster_sg.id]
+  }
   egress {
     from_port   = 0
     to_port     = 0

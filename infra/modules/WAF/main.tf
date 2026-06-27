@@ -56,27 +56,6 @@ resource "aws_wafv2_web_acl" "this" {
   }
 }
 rule {
-  name     = "AWSManagedIPDDoSList"
-  priority = 4
-
-  override_action {
-    none {}
-  }
-
-  statement {
-    managed_rule_group_statement {
-      name        = "AWSManagedIPDDoSList"
-      vendor_name = "AWS"
-    }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "ipDDoSList"
-    sampled_requests_enabled   = true
-  }
-}
-rule {
   name     = "AWSManagedAnonymousIPList"
   priority = 3
 
