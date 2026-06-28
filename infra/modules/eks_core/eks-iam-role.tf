@@ -1,6 +1,4 @@
-# ----------------------------
 # IAM Role for EKS Cluster
-# ----------------------------
 resource "aws_iam_role" "eks_cluster_role" {
   name = "${var.env}-${var.project_name}-eks-cluster-role"
 
@@ -21,9 +19,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
-# ----------------------------
 # IAM Role for NodeGroup
-# ----------------------------
 resource "aws_iam_role" "node_role" {
   name = "${var.env}-${var.project_name}-eks-node-role"
 

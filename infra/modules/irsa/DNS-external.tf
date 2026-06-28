@@ -38,27 +38,28 @@ resource "aws_iam_policy" "externaldns_policy" {
       {
         Effect = "Allow",
         Action = [
-          "route53:ListHostedZones",
-          "route53:ListHostedZonesByName",
-          "route53:ListResourceRecordSets"
+          "route53:ListHostedZones"
         ],
-        Resource = "*"
+        Resource = ["*"]
       },
 
       # Allow changes only on specific hosted zones
       {
         Effect = "Allow",
         Action = [
-          "route53:ChangeResourceRecordSets"
+          "route53:ChangeResourceRecordSets",
+          "route53:ListTagsForResources",
+          "route53:ListResourceRecordSets"
         ],
         # Resource = var.route53_zone_arns
-        Resource = ["*"]
+        Resource = ["arn:aws:route53:::hostedzone/*"]  
       } 
     ]
   })
 }
 
 resource "aws_iam_role_policy_attachment" "externaldns_attach" {
+  count = var.enable_dns_external ? 1 : 0
   role       = aws_iam_role.externaldns_irsa[0].name
   policy_arn = aws_iam_policy.externaldns_policy[0].arn
 }

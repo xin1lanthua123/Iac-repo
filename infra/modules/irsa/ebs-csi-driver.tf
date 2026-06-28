@@ -38,5 +38,8 @@ resource "aws_eks_addon" "ebs_csi" {
   service_account_role_arn = aws_iam_role.ebs_csi[0].arn
   resolve_conflicts = "OVERWRITE"
   addon_version = var.ebs_csi_version
+  depends_on = [
+  aws_iam_role_policy_attachment.ebs_csi_attach
+]
 
 }

@@ -1,6 +1,9 @@
 output "route53_domain_name" {
-  value = aws_route53_zone.main.name
+  value = data.aws_route53_zone.main.name
 }
 output "route53_zone_arns" {
-  value = aws_route53_zone.main.arn
+  value = data.aws_route53_zone.main.arn
+}
+output "certificate_arn" {
+  value = aws_acm_certificate.cert.arn
 }

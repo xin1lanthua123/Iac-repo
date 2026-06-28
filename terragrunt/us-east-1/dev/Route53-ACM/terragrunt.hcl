@@ -7,12 +7,10 @@ include "env" {
     merge_strategy = "no_merge"
     }
 terraform {
-    source = "../../../../infra/modules/WAF"
+    source = "../../../../infra/modules/Route53-ACM"
 }
 inputs = {
-    project_name = include.env.locals.tags.Project
-    tags         = include.env.locals.tags
-    env          = include.env.locals.tags.env
+    domain_name  = include.env.locals.route53.domain_name
 }
 
      
