@@ -54,6 +54,9 @@ locals {
         }
     }
   }
+  route53 = {
+    domain_name = "quanldl.click"
+  }
  
 }
 
