@@ -31,7 +31,7 @@ locals {
       ebs_csi_driver_sa       = "ebs-csi-controller-sa"
       ebs_csi_version         = "v1.30.0-eksbuild.1"
       external_dns_sa         = "external-dns"
-      cluster_autoscaler_sa   = "cluster_autoscaler"
+      cluster_autoscaler_sa   = "cluster-autoscaler"
   }
   }
   vpc = {
