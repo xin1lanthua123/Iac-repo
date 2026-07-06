@@ -21,6 +21,7 @@ inputs = {
   enable_ebs_csi_driver   = include.env.locals.irsa.enable_eks_addons.enable_ebs_csi_driver
   enable_eso              = include.env.locals.irsa.enable_eks_addons.enable_eso
   enable_karpenter        = include.env.locals.irsa.enable_eks_addons.enable_karpenter
+  enable_cluster_autoscaler = include.env.locals.irsa.enable_eks_addons.enable_cluster_autoscaler
 
   eks_cluster_arn         = dependency.eks_core.outputs.eks_cluster_arn
   oidc_provider_arn       = dependency.eks_core.outputs.oidc_provider_arn
@@ -35,7 +36,7 @@ inputs = {
   ebs_csi_driver_sa       = include.env.locals.irsa.service_accounts.ebs_csi_driver_sa
   ebs_csi_version         = include.env.locals.irsa.service_accounts.ebs_csi_version
   alb_service_sa          = include.env.locals.irsa.service_accounts.alb_service_sa
- 
+  cluster_autoscaler_sa   = include.env.locals.irsa.service_accounts.cluster_autoscaler_sa
 }
 
 dependency "eks_core" {
