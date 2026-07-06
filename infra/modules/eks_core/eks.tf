@@ -140,6 +140,9 @@ resource "aws_eks_node_group" "nodes" {
   }
   tags = merge (var.tags,{
     Name = "${var.project_name}-node-${each.key}"
+    "k8s.io/cluster-autoscaler/enabled" = "true"
+
+    "k8s.io/cluster-autoscaler/${var.env}-${var.project_name}-eks" = "owned"
 })
   depends_on = [
     aws_iam_role_policy_attachment.node_worker_policy,
