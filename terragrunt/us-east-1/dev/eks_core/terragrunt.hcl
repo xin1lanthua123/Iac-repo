@@ -7,7 +7,7 @@ include "env" {
     merge_strategy = "no_merge"
     }
 terraform {
-  source = "../../../../infra/modules/eks_core"
+  source = "${get_repo_root()}/infra/modules/eks_core"
 }
 inputs = {
     vpc_id             = dependency.vpc.outputs.vpc_id
