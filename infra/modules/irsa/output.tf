@@ -23,4 +23,6 @@ output "ebs_csi_role_arn" {
   value       = var.enable_ebs_csi_driver ? aws_iam_role.ebs_csi[0].arn : null
   description = "IAM role ARN for EBS CSI Driver"
 }
-
+output "cluster_autoscaler_role_arn" {
+  value = aws_iam_role.cluster_autoscaler[0].arn
+}

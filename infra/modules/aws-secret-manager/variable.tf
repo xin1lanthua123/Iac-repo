@@ -10,3 +10,9 @@ variable "db_name" {
 variable "username" {
   type = string
 }
+
+variable "elastic_password" {
+  type = string 
+  default = "value"
+
+}

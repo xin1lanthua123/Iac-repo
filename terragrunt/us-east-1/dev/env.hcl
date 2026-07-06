@@ -22,6 +22,7 @@ locals {
       enable_ebs_csi_driver = true
       enable_eso            = true
       enable_karpenter      = true
+      enable_cluster_autoscaler    = true
   }
     service_accounts = {
       alb_service_sa          = "aws-load-balancer-controller"
@@ -30,6 +31,7 @@ locals {
       ebs_csi_driver_sa       = "ebs-csi-controller-sa"
       ebs_csi_version         = "v1.30.0-eksbuild.1"
       external_dns_sa         = "external-dns"
+      cluster_autoscaler_sa   = "cluster_autoscaler"
   }
   }
   vpc = {

@@ -8,7 +8,7 @@ include "env" {
     }
 
 terraform {
-    source = "../../../../infra/modules/vpc"
+    source = "${get_repo_root()}/infra/modules/vpc"
 }
 
 inputs = {

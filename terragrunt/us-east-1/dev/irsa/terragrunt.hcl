@@ -7,7 +7,7 @@ include "env" {
     merge_strategy = "no_merge"
     }
 terraform {
-    source = "../../../../infra/modules/irsa"
+    source = "${get_repo_root()}/infra/modules/irsa"
 }
 inputs = {
   domain_name             = include.env.locals.irsa.enable_eks_addons.domain_name

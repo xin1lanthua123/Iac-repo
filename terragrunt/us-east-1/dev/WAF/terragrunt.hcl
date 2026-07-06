@@ -7,7 +7,7 @@ include "env" {
     merge_strategy = "no_merge"
     }
 terraform {
-    source = "../../../../infra/modules/WAF"
+    source = "${get_repo_root()}/infra/modules/WAF"
 }
 inputs = {
     project_name = include.env.locals.tags.Project
