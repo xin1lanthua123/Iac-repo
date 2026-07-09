@@ -90,7 +90,7 @@ resource "aws_security_group" "eks_nodes_sg" {
   
   ingress {
     description     = "allow to access istio webhook on node "
-    from_port       = 0
+    from_port       = 15017
     to_port         = 15017
     protocol        = "tcp"
     security_groups = [aws_security_group.eks_cluster_sg.id]
