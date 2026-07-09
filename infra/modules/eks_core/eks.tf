@@ -87,6 +87,14 @@ resource "aws_security_group" "eks_nodes_sg" {
     protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
+  
+  ingress {
+    description     = "allow to access istio webhook on node "
+    from_port       = 0
+    to_port         = 15017
+    protocol        = "tcp"
+    security_groups = [aws_security_group.eks_cluster_sg.id]
+  }
 
   ingress {
     description     = "EKS control plane to kubelet"
