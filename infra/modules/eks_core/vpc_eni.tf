@@ -4,6 +4,7 @@ resource "aws_eks_addon" "vpc_cni" {
 
   configuration_values = jsonencode({
     enableNetworkPolicy = "true"
+    networkPolicyEnforcingMode = "strict"
 
     env = {
       ENABLE_PREFIX_DELEGATION = "true"
