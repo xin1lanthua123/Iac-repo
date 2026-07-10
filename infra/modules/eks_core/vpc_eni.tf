@@ -6,7 +6,6 @@
 
   configuration_values = jsonencode({
     enableNetworkPolicy          = "true"
-    networkPolicyEnforcingMode   = "strict"
 
     env = {
       ENABLE_PREFIX_DELEGATION = "true"
