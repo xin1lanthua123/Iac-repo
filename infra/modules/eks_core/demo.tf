@@ -1,29 +1,3 @@
-resource "aws_security_group" "add_sg_eks" {
-  name   = "additional-eks-sg"
-  vpc_id = module.vpc.vpc_id
-  ingress {
-    description = "HTTPS from bastion host"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    security_groups = [aws_security_group.bastion_sg.id]
-  }
-
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "additional-eks-sg"
-  }
-}
-
-
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
@@ -46,17 +20,26 @@ module "eks" {
   }
 
   # Optional
-  endpoint_public_access = true
+    endpoint_public_access = true
   
 
   # Optional: Adds the current caller identity as an administrator via cluster access entry
-  enable_cluster_creator_admin_permissions = true
-  enable_irsa = var.enable_irsa
+    enable_cluster_creator_admin_permissions = true
+    enable_irsa = var.enable_irsa
 
 
-  vpc_id     = var.vpc_id
-  subnet_ids = var.private_subnet_ids
-
+    vpc_id     = var.vpc_id
+    subnet_ids = var.private_subnet_ids
+    node_security_group_additional_rules = {
+    istio_webhook = {
+      description                   = "Control plane to Istio webhook"
+      protocol                      = "tcp"
+      from_port                     = 15017
+      to_port                       = 15017
+      type                          = "ingress"
+      source_cluster_security_group = true
+    }
+  }
     eks_managed_node_groups = {
     for name, ng in var.node_groups :
     name => {
