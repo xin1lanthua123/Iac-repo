@@ -1,7 +1,3 @@
-locals {
-  oidc_host = replace(var.oidc_provider_url, "https://", "")
-}
-
 resource "aws_iam_role" "alb_irsa_role" {
   count = var.enable_alb_controller? 1 : 0
   name = "${var.cluster_name}-alb-irsa-role"

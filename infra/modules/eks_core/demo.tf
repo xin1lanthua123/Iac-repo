@@ -1,3 +1,28 @@
+resource "aws_security_group" "add_sg_eks" {
+  name   = "additional-eks-sg"
+  vpc_id = module.vpc.vpc_id
+  ingress {
+    description = "HTTPS from bastion host"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
+  }
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "additional-eks-sg"
+  }
+}
+
+
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"

@@ -1,12 +1,7 @@
 variable "project_name" {
   type = string
-  default = "my-app"
 }
-
 variable "region" {
-  type = string
-}
-variable "vpc_id" {
   type = string
 }
 variable "eks_cluster_arn" {
@@ -73,9 +68,7 @@ variable "route53_zone_arns" {
   description = "List of Route53 Hosted Zone ARNs ExternalDNS can manage"
   default     = []
 }
-variable "domain_name" {
-  type = string
-}
+
 variable "enable_alb_controller" {
   type = bool
   default = true
@@ -98,14 +91,5 @@ variable "enable_eso" {
 }
 variable "enable_karpenter" {
   type = bool
-  default = true
-}
-variable "helm_argocd_version" {
-  type = string
-  default = "null"
-}
-variable "server_insecure" {
-  type = bool
-  description = "value"
   default = true
 }

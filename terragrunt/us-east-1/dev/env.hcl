@@ -15,7 +15,6 @@ locals {
   irsa = { 
     enable_eks_addons = {
       cluster_name          = "dev-my-app-eks"
-      domain_name           = "quanldl.uk"
       region                = "us-east-1"
       enable_alb_controller = true
       enable_dns_external   = true
