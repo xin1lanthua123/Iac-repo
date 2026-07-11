@@ -12,9 +12,13 @@ terraform {
 }
 
 inputs = {
-    tags         = include.env.locals.tags
-    project_name = include.env.locals.tags.Project
-    single_nat_gateway = include.env.locals.vpc.single_nat_gateway
-    env            = include.env.locals.tags.env
-    aws_region     = "us-east-1"
+  tags = include.env.locals.tags
+  env = include.env.locals.tags.env
+  project_name = include.env.locals.tags.Project
+  vpc_cidr = include.env.locals.vpc.vpc_cidr
+  azs = include.env.locals.vpc.azs
+  private_subnets = include.env.locals.vpc.private_subnets
+  public_subnets = include.env.locals.vpc.public_subnets
+  enable_nat_gateway = include.env.locals.vpc.enable_nat_gateway
+  single_nat_gateway = include.env.locals.vpc.single_nat_gateway
 }
