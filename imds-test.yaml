@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: imds-test
+  namespace: kube-system
+spec:
+  nodeName: ip-10-0-100-135.ec2.internal
+  hostNetwork: true
+  containers:
+  - name: curl
+    image: curlimages/curl
+    command:
+    - sleep
+    - "3600"
+  restartPolicy: Never

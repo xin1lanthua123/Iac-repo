@@ -15,9 +15,6 @@ variable "tags" {
 variable "vpc_id" {
   type = string
 }
-variable "vpc_cidr" {
-  type = string
-}
 variable "cluster_version" {
   type    = string
   default = "1.30"

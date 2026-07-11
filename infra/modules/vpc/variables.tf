@@ -18,7 +18,28 @@ variable "single_nat_gateway" {
   default = true 
 }
 
-variable "aws_region" {
+variable "vpc_cidr" {
   type = string
-  default = "us-east-1"
+  default = "10.0.0.0/16"
+}
+
+variable "azs" {
+  description = "Availability zones"
+  type        = list(string)
+}
+
+variable "private_subnets" {
+  description = "Private subnet CIDR list"
+  type        = list(string)
+}
+
+
+variable "public_subnets" {
+  description = "Public subnet CIDR list"
+  type        = list(string)
+}
+variable "enable_nat_gateway" {
+  description = "Enable NAT Gateway"
+  type        = bool
+  default     = true
 }
