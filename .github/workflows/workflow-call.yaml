@@ -64,6 +64,7 @@ jobs:
               run: |
                 set -euo pipefail
                 terragrunt run-all apply -auto-approve --terragrunt-non-interactive
+                
     destroy:
       if: inputs.action == 'destroy'
       runs-on: ubuntu-latest
