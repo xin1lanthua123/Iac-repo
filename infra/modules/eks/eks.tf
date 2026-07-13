@@ -14,9 +14,13 @@ module "eks" {
       most_recent = true
     }
     vpc-cni = {
-      before_compute = true
-      most_recent = true
-    }
+  configuration_values = jsonencode({
+    enableNetworkPolicy = "true"
+  })
+
+  before_compute = true
+  most_recent   = true
+}
   }
 
   # Optional
