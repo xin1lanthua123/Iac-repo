@@ -1,117 +1,127 @@
 name: Reusable workflow CICD pipeline
 on: 
-    workflow_call:
-      inputs:
-        action:
-            description: "Terraform action"
-            required: true
-            default: "apply-ENV"
-            type: string
-        env:
-            description: "environment (prod or dev)"
-            required: true
-            default: "dev"
-            type: string
-        aws_region:
-            description: "AWS region"
-            required: true
-            type: string
+  workflow_call:
+    inputs:
+      action:
+        description: "Terraform action (plan, apply, destroy)"
+        required: true
+        type: string  
+      env:
+        description: "environment (prod or dev)"
+        required: true
+        type: string
+      aws_region:
+        description: "AWS region"
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
 
-
-      
-      secrets:
-        AWS_ACCESS_KEY_ID:
-          required: true
-        AWS_SECRET_ACCESS_KEY:
-          required: true
 jobs:
-    apply-env:
-        runs-on: ubuntu-latest
+  
+  infra-execution:
+    runs-on: ubuntu-latest
+
+    if: inputs.action == 'plan' || inputs.action == 'apply'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Install Terragrunt and OpenTofu
+        uses: gruntwork-io/terragrunt-action@v3
+        with:
+          tg_version: '0.82.2'
+          tofu_version: '1.10.1'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: Plan terraform infra using terragrunt
+        if:  inputs.action == 'plan' || inputs.action == 'apply'
+        shell: bash
+        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
+        run: |
+          terragrunt run-all plan --terragrunt-non-interactive
+  
+      - name: Apply terraform infra using terragrunt
         if: inputs.action == 'apply'
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+        shell: bash
+        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
+        run: |
+          set -euo pipefail
+          terragrunt run-all apply -auto-approve --terragrunt-non-interactive
 
-            - name: Setup jq
-              uses: dcarbone/install-jq-action@v2
+ 
+  destroy:
+    runs-on: ubuntu-latest
+    if: inputs.action == 'destroy'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Setup Terraform
-              uses: hashicorp/setup-terraform@v3
+    
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v2
 
-            - name: Install Terragrunt and OpenTofu
-              uses: gruntwork-io/terragrunt-action@v3
-              with:
-                    tg_version: '0.82.2'
-                    tofu_version: '1.10.1'
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-            - name: Configure AWS Credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                aws-region: ${{ inputs.aws_region }}
+      - name: Setup tools (Terragrunt & OpenTofu)
+        uses: gruntwork-io/terragrunt-action@v3
+        with:
+          tg_version: '0.82.2'
+          tofu_version: '1.10.1'
 
-            - name: Plan terraform infra using terragrunt
-              shell: bash
-              working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
-              run: |
-                terragrunt run-all plan --terragrunt-non-interactive
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: Safety confirmation
+        shell: bash
+        run: |
+          echo "Destroying environment: ${{ inputs.env }}"
+          echo "Region: ${{ inputs.aws_region }}"
+
+      - name: Terragrunt Destroy (all)
+        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          terragrunt run-all destroy -auto-approve --terragrunt-non-interactive
             
+      - name: Recreate backend config
+        working-directory: terragrunt/bootstrap/local
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x remote_state.sh
+          ./remote_state.sh
 
-            - name: Apply terraform infra using terragrunt
-              working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
-              shell: bash
-              run: |
-                set -euo pipefail
-                terragrunt run-all apply -auto-approve --terragrunt-non-interactive
-                
-    destroy:
-      if: inputs.action == 'destroy'
-      runs-on: ubuntu-latest
+      - name: Init remote backend
+        working-directory: terragrunt/bootstrap/local
+        shell: bash
+        run: |
+          terragrunt init --terragrunt-non-interactive
 
-      steps:
-        - uses: actions/checkout@v4
-
-        - name: Setup tools
-          uses: gruntwork-io/terragrunt-action@v3
-          with:
-            tg_version: '0.82.2'
-            tofu_version: '1.10.1'
-
-        - name: Configure AWS
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ inputs.aws_region }}
-
-        - name: Safety confirmation
-          run: |
-            echo "Destroying environment: ${{ inputs.env }}"
-            echo "Region: ${{ inputs.aws_region }}"
-
-        - name: Terragrunt Destroy (all)
-          working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
-          run: |
-            set -euo pipefail
-            terragrunt run-all destroy -auto-approve --terragrunt-non-interactive
-            
-        - name: Recreate backend config
-          working-directory: terragrunt/bootstrap/local
-          run: |
-            chmod +x remote_state.sh
-            ./remote_state.sh
-
-        - name: Init remote backend
-          working-directory: terragrunt/bootstrap/local
-          run: |
-            terragrunt init --terragrunt-non-interactive
-
-        - name: Destroy Bootstrap
-          working-directory: terragrunt/bootstrap/local
-          run: |
-            set -euo pipefail
-            terragrunt destroy --auto-approve --terragrunt-non-interactive
-        
-
-        
+      - name: Destroy Bootstrap
+        working-directory: terragrunt/bootstrap/local
+        shell: bash
+        run: |
+          set -euo pipefail
+          terragrunt destroy --auto-approve --terragrunt-non-interactive
