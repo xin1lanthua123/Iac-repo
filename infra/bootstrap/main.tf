@@ -10,6 +10,11 @@ resource "aws_kms_key" "tf_state" {
   tags = var.kms_state_tags
 }
 
+resource "aws_kms_alias" "tf_state" {
+  name = "alias/myapp-terraform-state"
+
+  target_key_id = aws_kms_key.tf_state[0].key_id
+}
 resource "aws_s3_bucket" "tf_state" {
   bucket = "${var.project_name}-terraform-tf-state"
     tags = {
@@ -32,12 +37,6 @@ resource "aws_s3_bucket_ownership_controls" "tf_state" {
   }
 }
 
-resource "aws_s3_bucket_acl" "tf_state" {
-  depends_on = [aws_s3_bucket_ownership_controls.tf_state]
-
-  bucket = aws_s3_bucket.tf_state.id
-  acl    = "private"
-}
 resource "aws_s3_bucket_server_side_encryption_configuration" "tfstate_enc" {
   bucket = aws_s3_bucket.tf_state.id
   depends_on = [aws_kms_key.tf_state]

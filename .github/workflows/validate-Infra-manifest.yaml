@@ -18,23 +18,25 @@ on:
         options:
           - destroy
 
-  pull_request:
-    branches:
-      - dev
-      - main
-    paths:
-      - 'infra/modules/**'
-      - 'terragrunt/us-east-1/**'
-      - '.github/workflows/validate-Infra-manifest.yaml'
+  # pull_request:
+  #   branches:
+  #     - dev
+  #     - main
+  #     - demo
+  #   paths:
+  #     - 'infra/modules/**'
+  #     - 'terragrunt/us-east-1/**'
+  #     - '.github/workflows/validate-Infra-manifest.yaml'
 
-  push:
-    branches:
-      - dev
-      - main
-    paths:
-      - 'infra/modules/**'
-      - 'terragrunt/us-east-1/**'
-      - '.github/workflows/validate-Infra-manifest.yaml'
+  # push:
+  #   branches:
+  #     - dev
+  #     - main
+  #     - demo
+  #   paths:
+  #     - 'infra/modules/**'
+  #     - 'terragrunt/us-east-1/**'
+  #     - '.github/workflows/validate-Infra-manifest.yaml'
 
 concurrency:
   group: gitops-${{ github.workflow }}-${{ github.ref_name }}
@@ -136,6 +138,7 @@ jobs:
     name: "Terragrunt logic Scan"
     runs-on: ubuntu-latest
     needs: detect-changes
+  
     if: |
       needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||  
       needs.detect-changes.outputs.workflow_changed == 'true'
@@ -150,13 +153,21 @@ jobs:
           tofu_version: '1.10.1'
 
       - name: Check Terragrunt manifest logic
-        working-directory: terragrunt/us-east-1/${{ github.event.inputs.env }}
+        working-directory: >-
+          terragrunt/us-east-1/${{
+            github.event_name == 'workflow_dispatch'
+              && github.event.inputs.env
+              || github.ref_name == 'main'
+              && 'prod'
+              || 'dev'
+          }}
         run: |
           terragrunt run-all validate
         env: 
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
           AWS_REGION: us-east-1
+
   secret-scan:
     name: Secret Scan (Gitleaks)
     runs-on: ubuntu-latest
@@ -176,12 +187,20 @@ jobs:
   call-terraform-for-dev:
     needs: [detect-changes, terraform-scan, terragrunt-scan,secret-scan]
     if: |
-      github.ref == 'refs/heads/dev' &&
-      github.event.inputs.env == 'dev' &&
       (
-        needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||
-        needs.detect-changes.outputs.terraform_modules_changed == 'true' ||  
-        needs.detect-changes.outputs.workflow_changed == 'true'
+        (
+          github.ref == 'refs/heads/dev' ||
+          github.ref == 'refs/heads/demo'
+        ) &&
+        (
+          needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||
+          needs.detect-changes.outputs.terraform_modules_changed == 'true' ||
+          needs.detect-changes.outputs.workflow_changed == 'true'
+        )
+      ) ||
+      (
+        github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.env == 'dev'
       )
     uses: ./.github/workflows/workflow-call.yaml
     with: 
@@ -191,18 +210,24 @@ jobs:
     secrets: inherit
         
   call-terraform-for-prod:
-    needs: [detect-changes, terraform-scan, terragrunt-scan,secret-scan]
+    needs: [detect-changes, terraform-scan, terragrunt-scan, secret-scan]
     if: |
-      github.ref == 'refs/heads/main' &&
-      github.event.inputs.env == 'prod' &&
       (
-        needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||
-        needs.detect-changes.outputs.terraform_modules_changed == 'true' || 
-        needs.detect-changes.outputs.workflow_changed == 'true'
+        github.ref == 'refs/heads/main' &&
+        (
+          needs.detect-changes.outputs.terragrunt_modules_changed == 'true' ||
+          needs.detect-changes.outputs.terraform_modules_changed == 'true' ||
+          needs.detect-changes.outputs.workflow_changed == 'true'
+        )
+      ) ||
+      (
+        github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.env == 'prod'
       )
     uses: ./.github/workflows/workflow-call.yaml
-    with: 
+    with:
       env: prod
       action: ${{ github.event_name == 'pull_request' && 'plan' || (github.event_name == 'push' && 'apply' || github.event.inputs.action) }}
       aws_region: 'us-east-1'
     secrets: inherit
+      

@@ -7,10 +7,12 @@ include "env" {
     merge_strategy = "no_merge"
     }
 terraform {
-    source = "../../../../infra/modules/aws-secret-manager"
+  source = "${get_repo_root()}/infra/modules/ec2"
 }
 inputs = {
-    env                        = include.env.locals.tags.env
-   
+   aws_region    = include.env.locals.ec2.region
+   key_name      = include.env.locals.ec2.key_name
+   instance_type = include.env.locals.ec2.instance_type
 }
+
 
