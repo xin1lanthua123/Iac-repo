@@ -64,6 +64,57 @@ jobs:
           set -euo pipefail
           terragrunt run-all apply -auto-approve --terragrunt-non-interactive
 
+      - name: Get  Secret Name
+        if: inputs.action == 'apply'
+        id: github-secret
+        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          terragrunt output -json secret_names > secrets.json
+
+      - name: Inject Secrets Manager values
+        if: inputs.action == 'apply'
+        env:
+          ARGOCD_SLACK_TOKEN: ${{ secrets.ARGOCD_SLACK_TOKEN }}
+          ALERTMANAGER_SLACK_TOKEN: ${{ secrets.ALERTMANAGER_SLACK_TOKEN }}
+          GITHUB_APP_JSON: ${{ secrets.GIT_APP_JSON }}
+        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ARGOCD_SLACK_SECRET=$(jq -r '.argocd_slack' secrets.json)
+          ALERTMANAGER_SLACK_SECRET=$(jq -r '.alertmanager_slack' secrets.json)
+          GITHUB_APP_SECRET=$(jq -r '.github_app' secrets.json)
+
+          if [ "$ARGOCD_SLACK_SECRET" = "null" ]; then
+            echo "Missing argocd_slack secret output"
+            exit 1
+          fi
+
+          if [ "$ALERTMANAGER_SLACK_SECRET" = "null" ]; then
+            echo "Missing alertmanager_slack secret output"
+            exit 1
+          fi
+
+          if [ "$GITHUB_APP_SECRET" = "null" ]; then
+            echo "Missing github_app secret output"
+            exit 1
+          fi
+
+          aws secretsmanager put-secret-value \
+            --secret-id "$ARGOCD_SLACK_SECRET" \
+            --secret-string "$ARGOCD_SLACK_TOKEN"
+
+          aws secretsmanager put-secret-value \
+            --secret-id "$ALERTMANAGER_SLACK_SECRET" \
+            --secret-string "$ALERTMANAGER_SLACK_TOKEN"
+
+           aws secretsmanager put-secret-value \
+            --secret-id "$GITHUB_APP_SECRET" \
+            --secret-string "$GITHUB_APP_JSON"
+
  
   destroy:
     runs-on: ubuntu-latest

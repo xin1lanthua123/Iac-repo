@@ -49,6 +49,7 @@ module "eks" {
     name => {
       ami_type       = "AL2023_x86_64_STANDARD"
       instance_types = [ng.node_instance_type]
+      capacity_type = "ON_DEMAND"
 
       desired_size = ng.desired_size
       min_size     = ng.min_size

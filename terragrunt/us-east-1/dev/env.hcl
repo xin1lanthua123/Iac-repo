@@ -2,19 +2,22 @@
 locals {
   tags = {
     env          = "dev"
-    Project      = "my-app"
+    Project      = "online-boutique"
     ManagedBy    = "terraform"
   }
-  aws_secret_manager = {
-    secret_for_rds = {
-      db_name = "dev-postgres-db"
-      username = "my-app-dev"
-      password = "set up in secret manager module"
-    }
+  ec2 = {
+    region = "us-east-1"
+    key_name = "EC2 SSH key pair"
+    instance_type = "t3.medium"
   }
+  aws_secret_manager = {
+        argocd_slack_token = "token"
+        alertmanager_slack_webhook = "webhook-url"
+    }
+  
   irsa = { 
     enable_eks_addons = {
-      cluster_name          = "dev-my-app-eks"
+      cluster_name          = "dev-online-boutique-eks"
       region                = "us-east-1"
       enable_alb_controller = true
       enable_dns_external   = true
@@ -50,13 +53,6 @@ locals {
     enable_nat_gateway = true
     single_nat_gateway = true
 
-  }
-  rds = {
-    engine_version = "15"
-    multi_az       = false
-    instance_class = "db.t3.micro"
-    db_name        = "devpostgresdb"
-    db_username    = "devmyappdb"
   }
   eks = {
       cluster_version = "1.30"
