@@ -1,4 +1,4 @@
-name: validate and deploy workflows
+name: validate and deploy workflowd
 on:
   workflow_dispatch:
     inputs:
