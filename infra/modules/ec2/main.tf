@@ -19,7 +19,7 @@ resource "aws_security_group" "sonarqube_sg" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [
-      "0.0.0.0"
+      "42.113.184.4/32"
     ]
   }
 
@@ -29,7 +29,7 @@ resource "aws_security_group" "sonarqube_sg" {
     to_port = 9000
     protocol = "tcp"
     cidr_blocks = [
-      "0.0.0.0"
+      "42.113.184.4/32"
     ]
   }
   egress {
@@ -53,11 +53,11 @@ resource "aws_instance" "sonarqube" {
   ]
   root_block_device {
 
-    volume_size = 40
+    volume_size = 20
 
     volume_type = "gp3"
   }
-  user_data = file("userdata-1.sh")
+  user_data = file("userdata.sh")
   tags = {
     Name = "sonarqube-server"
     Environment = "cicd"

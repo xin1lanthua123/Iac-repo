@@ -3,17 +3,14 @@ locals {
   tags = {
     env          = "dev"
     Project      = "online-boutique"
-    ManagedBy    = "terraform"
+    ManagedBy    = "Terraform"
   }
   ec2 = {
     region = "us-east-1"
     key_name = "EC2 SSH key pair"
     instance_type = "t3.medium"
   }
-  aws_secret_manager = {
-        argocd_slack_token = "token"
-        alertmanager_slack_webhook = "webhook-url"
-    }
+
   
   irsa = { 
     enable_eks_addons = {

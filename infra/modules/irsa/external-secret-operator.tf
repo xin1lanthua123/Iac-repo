@@ -50,7 +50,7 @@ resource "aws_iam_policy" "eso_policy" {
           "secretsmanager:DescribeSecret"
         ],
         # Resource = var.secrets_manager_arns
-        Resource = "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.project_name}/${var.env}/*"
+        Resource = "*"
       }
     ]
   })

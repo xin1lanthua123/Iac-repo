@@ -14,8 +14,8 @@ output "secret_names" {
 
   value = {
 
-    argocd_slack = aws_secretsmanager_secret.argocd_slack.name
-    alertmanager_slack = aws_secretsmanager_secret.alertmanager_slack.name
+    argocd_slack_token = aws_secretsmanager_secret.argocd_slack.name
+    alertmanager_slack_webhook = aws_secretsmanager_secret.alertmanager_slack.name
     github_app =  aws_secretsmanager_secret.github_app.name
 
   }

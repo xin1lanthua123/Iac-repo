@@ -84,8 +84,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          ARGOCD_SLACK_SECRET=$(jq -r '.argocd_slack' secrets.json)
-          ALERTMANAGER_SLACK_SECRET=$(jq -r '.alertmanager_slack' secrets.json)
+          ARGOCD_SLACK_SECRET=$(jq -r '.argocd_slack_token' secrets.json)
+          ALERTMANAGER_SLACK_SECRET=$(jq -r '.alertmanager_slack_webhook' secrets.json)
           GITHUB_APP_SECRET=$(jq -r '.github_app' secrets.json)
 
           if [ "$ARGOCD_SLACK_SECRET" = "null" ]; then
@@ -102,18 +102,19 @@ jobs:
             echo "Missing github_app secret output"
             exit 1
           fi
-
+          
+          
           aws secretsmanager put-secret-value \
             --secret-id "$ARGOCD_SLACK_SECRET" \
-            --secret-string "$ARGOCD_SLACK_TOKEN"
+            --secret-string "{\"slack-token\":\"$ARGOCD_SLACK_TOKEN\"}"
 
           aws secretsmanager put-secret-value \
             --secret-id "$ALERTMANAGER_SLACK_SECRET" \
-            --secret-string "$ALERTMANAGER_SLACK_TOKEN"
+            --secret-string "{\"slack-webhook-url\":\"$ALERTMANAGER_SLACK_TOKEN\"}"
 
-           aws secretsmanager put-secret-value \
+          aws secretsmanager put-secret-value \
             --secret-id "$GITHUB_APP_SECRET" \
-            --secret-string "$GITHUB_APP_JSON"
+            --secret-string "{\"github-app\":\"$GITHUB_APP_JSON\"}"
 
  
   destroy:

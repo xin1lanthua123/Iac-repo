@@ -38,7 +38,7 @@ inputs = {
 }
 
 dependency "eks_core" {
-    config_path = "../eks_core"
+    config_path = "../eks"
     
     mock_outputs = {
     cluster_endpoint = "https://mock"

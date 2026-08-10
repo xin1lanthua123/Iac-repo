@@ -41,7 +41,7 @@ resource "aws_iam_policy" "github_actions_infra_policy" {
     }
   }
     },
-      # S3 Backup logs
+      # S3 
    
      {
         Sid    = "S3LogsAndBackup",
@@ -55,7 +55,7 @@ resource "aws_iam_policy" "github_actions_infra_policy" {
             "s3:PutLifecycleConfiguration",
             "s3:ListBucket"
         ],
-        Resource = "arn:aws:s3:::my-log-bucket" #,"*"
+        Resource = "*" #,"*"
         },
         {
         Sid    = "S3LogBucketObjects",
@@ -65,7 +65,7 @@ resource "aws_iam_policy" "github_actions_infra_policy" {
           "s3:GetObject",
           "s3:DeleteObject"
         ],
-        Resource = "arn:aws:s3:::my-log-bucket/*"  #,"*"
+        Resource = "*"  #,"*"
       },
        {
         Sid    = "KMSforS3BackUpLogs",

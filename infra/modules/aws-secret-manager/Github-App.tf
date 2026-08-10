@@ -10,3 +10,8 @@ resource "aws_secretsmanager_secret" "github_app" {
     Application = "argocd"
   }
 }
+
+
+
+
+
