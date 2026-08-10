@@ -94,3 +94,26 @@ resource "aws_iam_role_policy_attachment" "karpenter_attach" {
   policy_arn = aws_iam_policy.karpenter_policy[0].arn
 }
 
+module "karpenter_irsa_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+  role_name = "karpenter-controller"
+
+  attach_karpenter_controller_policy = true
+
+  karpenter_controller_cluster_name = module.eks.cluster_name
+
+  karpenter_controller_node_iam_role_arns = [
+    module.eks.eks_managed_node_groups["default"].iam_role_arn
+  ]
+
+  oidc_providers = {
+    main = {
+      provider_arn = var.oidc_provider_arn
+
+      namespace_service_accounts = [
+        "karpenter:karpenter"
+      ]
+    }
+  }
+}

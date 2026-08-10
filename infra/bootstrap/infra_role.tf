@@ -1,4 +1,3 @@
-
 resource "aws_iam_role" "github_actions_infra" {
   name = "${var.project_name}-github-infra-and-backend-state-role"
 
@@ -20,6 +19,7 @@ resource "aws_iam_role" "github_actions_infra" {
     }]
   })
 }
+
 resource "aws_iam_role_policy_attachment" "infra" {
   role       = aws_iam_role.github_actions_infra.name
   policy_arn = aws_iam_policy.github_actions_infra_policy.arn
