@@ -135,7 +135,7 @@ jobs:
         with:
           directory: .
           framework: terraform
-          soft_fail: true # true for prod
+          soft_fail: true # false for prod
           skip_check: CKV_AWS_39,CKV_AWS_58
           output_format: cli
 
