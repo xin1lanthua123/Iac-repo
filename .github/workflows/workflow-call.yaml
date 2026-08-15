@@ -24,6 +24,8 @@ jobs:
   
   infra-execution:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.env }}
 
     if: inputs.action == 'plan' || inputs.action == 'apply'
     steps:
@@ -120,6 +122,8 @@ jobs:
   destroy:
     runs-on: ubuntu-latest
     if: inputs.action == 'destroy'
+    environment:
+      name: ${{ inputs.env }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

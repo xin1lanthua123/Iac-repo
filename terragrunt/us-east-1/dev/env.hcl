@@ -6,11 +6,10 @@ locals {
     ManagedBy    = "Terraform"
   }
   ec2 = {
-    region = "us-east-1"
-    key_name = "EC2 SSH key pair"
-    instance_type = "t3.medium"
-  }
-
+    region        = "us-east-1"
+    key_name      = "fxvxfsdf"
+    instance_type = "t2.large"
+}
   
   irsa = { 
     enable_eks_addons = {

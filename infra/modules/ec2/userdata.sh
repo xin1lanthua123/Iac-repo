@@ -3,7 +3,7 @@
 set -e
 sudo apt update
 sudo apt upgrade -y
-sudo apt install -y docker.io docker-compose-plugin  wget
+sudo apt install -y docker.io docker-compose  wget
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker ubuntu
@@ -53,7 +53,7 @@ services:
 
     environment:
       NGINX_PROXY_CONTAINER: nginx-proxy
-      DEFAULT_EMAIL: your-email@example.com
+      DEFAULT_EMAIL: ldlq2005@gmail.com
 
     restart: unless-stopped
 
@@ -72,9 +72,9 @@ services:
       SONAR_JDBC_PASSWORD: sonar
 
       # nginx-proxy + Let's Encrypt
-      VIRTUAL_HOST: sca.example.com
-      LETSENCRYPT_HOST: sca.example.com
-      LETSENCRYPT_EMAIL: your-email@example.com
+      VIRTUAL_HOST: sast.quanldl.uk
+      LETSENCRYPT_HOST: sast.quanldl.uk
+      LETSENCRYPT_EMAIL: ldlq2005@gmail.com
 
     expose:
       - "9000"
@@ -120,3 +120,5 @@ https://github.com/cnescatlab/sonar-cnes-report/releases/download/5.0.4/sonar-cn
 -O /home/ubuntu/sonarqube/sonarqube_plugins/sonar-cnes-report-5.0.4.jar
 cd /home/ubuntu/sonarqube
 docker compose up -d
+
+

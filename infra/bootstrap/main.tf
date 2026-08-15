@@ -11,12 +11,12 @@ resource "aws_kms_key" "tf_state" {
 }
 
 resource "aws_kms_alias" "tf_state" {
-  name = "alias/myapp-terraform-state"
+  name = "alias/myapp-terraform-state-1"
 
   target_key_id = aws_kms_key.tf_state[0].key_id
 }
 resource "aws_s3_bucket" "tf_state" {
-  bucket = "${var.project_name}-terraform-tf-state"
+  bucket = "${var.project_name}-terraform-tf-state-1"
     tags = {
     Project = var.project_name
   }

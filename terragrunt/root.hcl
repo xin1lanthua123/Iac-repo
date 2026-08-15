@@ -6,7 +6,7 @@ locals {
 remote_state {
   backend = "s3"
   config = {
-    bucket         = "myapp-terraform-tf-state"
+    bucket         = "myapp-terraform-tf-state-1"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = local.aws_region
     dynamodb_table = "myapp-terraform-locks"
