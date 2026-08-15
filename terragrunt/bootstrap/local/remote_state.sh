@@ -1,4 +1,4 @@
-BUCKET="myapp-terraform-tf-state"
+BUCKET="myapp-terraform-tf-state-1"
 DYNAMODB_LOCK="myapp-terraform-locks"
 echo "S3 bucket : $BUCKET"
 echo "DynamoDB lock :$DYNAMODB_LOCK"

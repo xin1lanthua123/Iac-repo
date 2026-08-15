@@ -11,7 +11,7 @@ resource "aws_kms_key" "tf_state" {
 }
 
 resource "aws_kms_alias" "tf_state" {
-  name = "alias/myapp-terraform-state-1"
+  name = "alias/myapp-terraform-state-2"
 
   target_key_id = aws_kms_key.tf_state[0].key_id
 }
