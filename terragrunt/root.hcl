@@ -11,7 +11,7 @@ remote_state {
     region         = local.aws_region
     dynamodb_table = "myapp-terraform-locks"
     encrypt        = true
-    kms_key_id     = "alias/myapp-terraform-state"
+    kms_key_id     = "alias/myapp-terraform-state-1"
   }
 }
 
