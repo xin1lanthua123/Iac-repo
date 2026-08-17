@@ -163,23 +163,23 @@ jobs:
           set -euo pipefail
           terragrunt run-all destroy -auto-approve --terragrunt-non-interactive
             
-      - name: Recreate backend config
-        working-directory: terragrunt/bootstrap/local
-        shell: bash
-        run: |
-          set -euo pipefail
-          chmod +x remote_state.sh
-          ./remote_state.sh
+      # - name: Recreate backend config
+      #   working-directory: terragrunt/bootstrap/local
+      #   shell: bash
+      #   run: |
+      #     set -euo pipefail
+      #     chmod +x remote_state.sh
+      #     ./remote_state.sh
 
-      - name: Init remote backend
-        working-directory: terragrunt/bootstrap/local
-        shell: bash
-        run: |
-          terragrunt init --terragrunt-non-interactive
+      # - name: Init remote backend
+      #   working-directory: terragrunt/bootstrap/local
+      #   shell: bash
+      #   run: |
+      #     terragrunt init --terragrunt-non-interactive
 
-      - name: Destroy Bootstrap
-        working-directory: terragrunt/bootstrap/local
-        shell: bash
-        run: |
-          set -euo pipefail
-          terragrunt destroy --auto-approve --terragrunt-non-interactive
+      # - name: Destroy Bootstrap
+      #   working-directory: terragrunt/bootstrap/local
+      #   shell: bash
+      #   run: |
+      #     set -euo pipefail
+      #     terragrunt destroy --auto-approve --terragrunt-non-interactive
