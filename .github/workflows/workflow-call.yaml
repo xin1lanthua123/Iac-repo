@@ -84,7 +84,7 @@ jobs:
           ARGOCD_SLACK_TOKEN: ${{ secrets.ARGOCD_SLACK_TOKEN }}
           ALERTMANAGER_SLACK_TOKEN: ${{ secrets.ALERTMANAGER_SLACK_TOKEN }}
           GITHUB_APP_JSON: ${{ secrets.GIT_APP_JSON }}
-        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
+        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}/aws-secret-manager
         shell: bash
         run: |
           set -euo pipefail
