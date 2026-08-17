@@ -30,7 +30,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_security_group" "sonarqube_sg" {
-  name = "sonarqube-security-group"
+  name = "${var.env}-sonarqube-security-group"
 
   ingress {
     from_port   = 22
@@ -75,7 +75,7 @@ resource "aws_instance" "sonarqube" {
   user_data = file("userdata.sh")
 
   tags = {
-    Name        = "sonarqube-server"
+    Name        = "${var.env}-sonarqube-server"
     Environment = "cicd"
   }
 }
