@@ -66,14 +66,17 @@ jobs:
           set -euo pipefail
           terragrunt run-all apply -auto-approve --terragrunt-non-interactive
 
-      - name: Get  Secret Name
+      - name: Get Secret Names
         if: inputs.action == 'apply'
         id: github-secret
-        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}
         shell: bash
+        working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}/aws-secret-manager
         run: |
           set -euo pipefail
-          terragrunt output -json secret_names > secrets.json
+
+          terragrunt output -json secret_names > "${GITHUB_WORKSPACE}/secrets.json"
+
+          echo "Secret names retrieved successfully."
 
       - name: Inject Secrets Manager values
         if: inputs.action == 'apply'
