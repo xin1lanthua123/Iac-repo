@@ -13,6 +13,7 @@ inputs = {
    aws_region    = include.env.locals.ec2.region
    key_name      = include.env.locals.ec2.key_name
    instance_type = include.env.locals.ec2.instance_type
+   env           = include.env.locals.tags.env
 }
 
 # dependency "vpc" {
