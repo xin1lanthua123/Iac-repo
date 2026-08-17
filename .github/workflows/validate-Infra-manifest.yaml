@@ -167,7 +167,7 @@ jobs:
               || 'dev'
           }}
         run: |
-          terragrunt run-all validate || true
+          terragrunt run-all validate 
         env: 
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
