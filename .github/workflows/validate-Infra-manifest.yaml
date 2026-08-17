@@ -1,4 +1,4 @@
-name: validate and deploy workflowd
+name: validate and deploy workflow
 on:
   workflow_dispatch:
     inputs:
@@ -32,6 +32,7 @@ on:
       - 'infra/modules/**'
       - 'terragrunt/us-east-1/**'
       - '.github/workflows/validate-Infra-manifest.yaml'
+      - '.github/workflows/workflow-call.yaml'
 
   push:
     branches:
@@ -42,6 +43,7 @@ on:
       - 'infra/modules/**'
       - 'terragrunt/us-east-1/**'
       - '.github/workflows/validate-Infra-manifest.yaml'
+      - '.github/workflows/workflow-call.yaml'
 
 concurrency:
   group: gitops-${{ github.workflow }}-${{ github.ref_name }}

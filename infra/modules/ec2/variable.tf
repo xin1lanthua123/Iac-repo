@@ -9,3 +9,10 @@ variable "instance_type" {
 variable "key_name" {
   description = "EC2 SSH key pair"
 }
+
+
+variable "env" {
+  description = "Environment"
+  type = string
+}
+
