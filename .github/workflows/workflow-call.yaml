@@ -68,15 +68,15 @@ jobs:
 
       - name: Get Secret Names
         if: inputs.action == 'apply'
-        id: github-secret
         shell: bash
         working-directory: terragrunt/${{ inputs.aws_region }}/${{ inputs.env }}/aws-secret-manager
         run: |
           set -euo pipefail
 
-          terragrunt output -json secret_names > "${GITHUB_WORKSPACE}/secrets.json"
+          terragrunt output -json secret_names > secrets.json
 
           echo "Secret names retrieved successfully."
+
 
       - name: Inject Secrets Manager values
         if: inputs.action == 'apply'
@@ -107,8 +107,7 @@ jobs:
             echo "Missing github_app secret output"
             exit 1
           fi
-          
-          
+
           aws secretsmanager put-secret-value \
             --secret-id "$ARGOCD_SLACK_SECRET" \
             --secret-string "{\"slack-token\":\"$ARGOCD_SLACK_TOKEN\"}"
