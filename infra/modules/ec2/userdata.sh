@@ -3,12 +3,24 @@
 set -e
 sudo apt update
 sudo apt upgrade -y
-sudo apt install -y docker.io docker-compose  wget
+sudo apt install -y docker.io docker-compose wget openssl
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker ubuntu
 newgrp docker
 mkdir -p /home/ubuntu/sonarqube
+DB_PASSWORD="$(openssl rand -base64 32 | tr -dc 'A-Za-z0-9' | head -c 32)"
+
+cat > /home/ubuntu/sonarqube/.env <<EOF
+POSTGRES_USER=sonar
+POSTGRES_PASSWORD=${DB_PASSWORD}
+POSTGRES_DB=sonar
+SONAR_JDBC_USERNAME=sonar
+SONAR_JDBC_PASSWORD=${DB_PASSWORD}
+EOF
+
+chmod 600 /home/ubuntu/sonarqube/.env
+
 cat <<EOF > /home/ubuntu/sonarqube/docker-compose.yml
 
 version: "3.8"
@@ -68,8 +80,8 @@ services:
 
     environment:
       SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
-      SONAR_JDBC_USERNAME: sonar
-      SONAR_JDBC_PASSWORD: sonar
+      SONAR_JDBC_USERNAME: ${SONAR_JDBC_USERNAME}
+      SONAR_JDBC_PASSWORD: ${SONAR_JDBC_PASSWORD}
 
       # nginx-proxy + Let's Encrypt
       VIRTUAL_HOST: sast.quanldl.uk
@@ -94,9 +106,9 @@ services:
     container_name: sonarqube_db
 
     environment:
-      POSTGRES_USER: sonar
-      POSTGRES_PASSWORD: sonar
-      POSTGRES_DB: sonar
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
 
     volumes:
       - postgresql:/var/lib/postgresql

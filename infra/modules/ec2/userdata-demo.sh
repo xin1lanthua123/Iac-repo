@@ -1,22 +1,43 @@
 #!/bin/bash
 
 set -euo pipefail
+
+# ============================================================
+# Configuration
+# ============================================================
+
 SONARQUBE_DIR="/home/ubuntu/sonarqube"
 DOMAIN="sast.quanldl.uk"
 LETSENCRYPT_EMAIL="ldlq2005@gmail.com"
+
 export DEBIAN_FRONTEND=noninteractive
+
+# ============================================================
+# Install packages
+# ============================================================
+
 apt-get update
 apt-get upgrade -y
+
 apt-get install -y \
   docker.io \
   docker-compose \
-  openssl \
   wget \
-  curl
+  openssl
+
+# ============================================================
+# Start Docker
+# ============================================================
+
 systemctl enable docker
 systemctl start docker
 
+# Allow ubuntu user to use Docker
 usermod -aG docker ubuntu
+
+# ============================================================
+# SonarQube system requirements
+# ============================================================
 
 cat > /etc/sysctl.d/99-sonarqube.conf <<'EOF'
 vm.max_map_count=524288
@@ -25,13 +46,24 @@ EOF
 
 sysctl --system
 
+# ============================================================
+# Create directories
+# ============================================================
 
+mkdir -p "${SONARQUBE_DIR}"
 mkdir -p "${SONARQUBE_DIR}/sonarqube_plugins"
 
 chown -R ubuntu:ubuntu "${SONARQUBE_DIR}"
 
+# ============================================================
+# Generate random PostgreSQL password
+# ============================================================
 
 DB_PASSWORD="$(openssl rand -base64 32 | tr -dc 'A-Za-z0-9' | head -c 32)"
+
+# ============================================================
+# Create .env
+# ============================================================
 
 cat > "${SONARQUBE_DIR}/.env" <<EOF
 POSTGRES_USER=sonar
@@ -50,6 +82,10 @@ EOF
 
 chmod 600 "${SONARQUBE_DIR}/.env"
 chown ubuntu:ubuntu "${SONARQUBE_DIR}/.env"
+
+# ============================================================
+# Create Docker Compose
+# ============================================================
 
 cat > "${SONARQUBE_DIR}/docker-compose.yml" <<'EOF'
 
@@ -120,8 +156,8 @@ services:
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       VIRTUAL_PORT: ${VIRTUAL_PORT}
 
-      ACME_HOST: ${ACME_HOST}
-      ACME_EMAIL: ${ACME_EMAIL}
+      LETSENCRYPT_HOST: ${ACME_HOST}
+      LETSENCRYPT_EMAIL: ${ACME_EMAIL}
 
     expose:
       - "9000"
@@ -175,19 +211,37 @@ volumes:
 
 EOF
 
-chown ubuntu:ubuntu "${SONARQUBE_DIR}/docker-compose.yml"
+# ============================================================
+# Download CNES Report Plugin
+# ============================================================
+
 wget \
   "https://github.com/cnescatlab/sonar-cnes-report/releases/download/5.0.4/sonar-cnes-report-5.0.4.jar" \
   -O "${SONARQUBE_DIR}/sonarqube_plugins/sonar-cnes-report-5.0.4.jar"
 
-chown -R ubuntu:ubuntu "${SONARQUBE_DIR}/sonarqube_plugins"
+chown -R ubuntu:ubuntu "${SONARQUBE_DIR}"
 
+# ============================================================
+# Validate Docker Compose
+# ============================================================
 
 cd "${SONARQUBE_DIR}"
 
-docker compose pull
+docker compose config
+
+# ============================================================
+# Start SonarQube stack
+# ============================================================
+
 docker compose up -d
+
+# ============================================================
+# Show status
+# ============================================================
+
 docker compose ps
+
+echo "============================================================"
 echo "SonarQube installation completed"
 echo "Domain: https://${DOMAIN}"
-echo "Directory: ${SONARQUBE_DIR}"
+echo "============================================================"

@@ -15,12 +15,12 @@ inputs = {
    instance_type = include.env.locals.ec2.instance_type
 }
 
-dependency "vpc" {
-    config_path = "../vpc"
-     mock_outputs = {
-     vpc_id = "vpc-0000000000"
-     vpc_cidr = "10.0.0.0/16"
-     private_subnets = ["subnet-11111111", "subnet-22222222"]
-  }
-}
+# dependency "vpc" {
+#     config_path = "../vpc"
+#      mock_outputs = {
+#      vpc_id = "vpc-0000000000"
+#      vpc_cidr = "10.0.0.0/16"
+#      private_subnets = ["subnet-11111111", "subnet-22222222"]
+#   }
+# }
 
