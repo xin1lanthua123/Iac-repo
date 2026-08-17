@@ -1,6 +1,6 @@
 resource "aws_iam_policy" "cluster_autoscaler" {
   count = var.enable_cluster_autoscaler ? 1 : 0
-  name = "AmazonEKSClusterAutoscalerPolicy"
+  name = "${var.env}-AmazonEKSClusterAutoscalerPolicy"
 
   policy = jsonencode({
     Version = "2012-10-17"
