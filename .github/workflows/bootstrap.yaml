@@ -77,6 +77,7 @@ jobs:
     needs: detect-changes
     if: |
       needs.detect-changes.outputs.terraform_bootstrap_changed == 'true' ||
+      needs.detect-changes.outputs.terragrunt_bootstrap_changed == 'true' ||
       needs.detect-changes.outputs.workflow_changed == 'true'
 
     steps:
@@ -106,6 +107,7 @@ jobs:
     needs: detect-changes
     if: |
       needs.detect-changes.outputs.terraform_bootstrap_changed == 'true' ||
+      needs.detect-changes.outputs.terragrunt_bootstrap_changed == 'true' ||
       needs.detect-changes.outputs.workflow_changed == 'true'
 
     steps:
