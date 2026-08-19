@@ -51,7 +51,7 @@ locals {
 
   }
   eks = {
-      cluster_version = "1.30"
+      cluster_version = "1.31"
       enable_irsa     = true
       node_groups = {
         group1 = {
