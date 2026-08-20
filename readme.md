@@ -3,5 +3,5 @@ ns-86.awsdns-10.com.
 ns-1283.awsdns-32.org.
 ns-930.awsdns-52.net.
 Access key
-
+aws kms delete-alias --alias-name alias/eks/dev-online-boutique-eks --region us-east-1 
 

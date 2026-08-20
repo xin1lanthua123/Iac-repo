@@ -28,7 +28,7 @@ variable "node_groups" {
     max_size = number
   }))
   default = {
-    "group1" = {
+    "node-group-1" = {
       node_instance_type = "t3.medium"
       desired_size = 2
       min_size = 1

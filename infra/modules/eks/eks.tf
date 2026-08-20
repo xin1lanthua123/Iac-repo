@@ -46,7 +46,7 @@ module "eks" {
   }
     eks_managed_node_groups = {
     for name, ng in var.node_groups :
-    name => {
+     "${var.env}-${name}" => {
       ami_type       = "AL2023_x86_64_STANDARD"
       instance_types = [ng.node_instance_type]
       capacity_type = "ON_DEMAND"
